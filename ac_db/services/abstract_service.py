@@ -1,17 +1,22 @@
+"""Module witch define all database operation for all models """
+
 from abc import ABCMeta
-from typing import Optional, Any, Iterable, Union
+from typing import Any, Iterable, Optional, Union
 
 from sqlalchemy import true
-from sqlalchemy.exc import SQLAlchemyError, OperationalError
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
-from tenacity import retry, stop_after_attempt, retry_if_exception_type, wait_fixed
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
-from ac_db.exceptions import DbOperationalError, DbError
+from ac_db.exceptions import DbError, DbOperationalError
 from ac_db.models.base import Base
 from ac_db.tools.decorators import check_operational
 
 
 class Service(metaclass=ABCMeta):
+    """
+    Base database management service
+    """
 
     def __init__(self, session: sessionmaker, table: Base):
         self._table = table
@@ -41,9 +46,13 @@ class Service(metaclass=ABCMeta):
         table = table or self._table
         if isinstance(value, Iterable) and not isinstance(value, str):
             return getattr(table, column_name).in_(value)
-        return (getattr(table, column_name) == value)
+        return (getattr(table, column_name) == value)   # pylint: disable=superfluous-parens
 
     def columns(self) -> Iterable:
+        """
+
+        :return:
+        """
         return self._table.__table__.columns.keys() if self._table else []
 
     def delete(self, **kwargs) -> None:
@@ -74,6 +83,16 @@ class Service(metaclass=ABCMeta):
     @check_operational
     def query(self, *order_by, session: Optional[sessionmaker] = None, table: Optional[Base] = None, filters: Optional[Any] = None,
               limit: Optional[int] = None, page: int = 0):
+        """
+        make query with order and filter for table
+        :param order_by:
+        :param session:
+        :param table:
+        :param filters:
+        :param limit:
+        :param page:
+        :return:
+        """
         session = session or self._session
         query = session.query(table or self._table)
         if len(order_by) > 0:
@@ -87,6 +106,12 @@ class Service(metaclass=ABCMeta):
         return query
 
     def format_filters(self, additional_filters=None, **kwargs) -> Any:
+        """
+
+        :param additional_filters:
+        :param kwargs:
+        :return:
+        """
         filters = additional_filters or true()
 
         for column_name, filter_value in kwargs.items():
@@ -105,6 +130,13 @@ class Service(metaclass=ABCMeta):
 
     @check_operational
     def intersect(self, session: Optional[sessionmaker] = None, table: Optional[Base] = None, filters: Optional[Iterable] = None):
+        """
+        make query with intersect
+        :param session:
+        :param table:
+        :param filters:
+        :return:
+        """
         session = session or self._session
         query = session.query(table or self._table)
         for inter_filter in filters or []:
@@ -113,16 +145,33 @@ class Service(metaclass=ABCMeta):
 
     @staticmethod
     def set_attribute(obj, **attributes):
+        """
+
+        :param obj:
+        :param attributes:
+        :return:
+        """
         for name, value in attributes.items():
             if value is not None:
                 setattr(obj, name, value)
 
     @retry(reraise=True, retry=retry_if_exception_type(DbOperationalError), wait=wait_fixed(2), stop=stop_after_attempt(2))
     def update(self, entry_id, **attributes):
+        """
+        Update attribute in database, with retry
+        :param entry_id:
+        :param attributes:
+        :return:
+        """
         entry = self.get(entry_id)
         Service.set_attribute(entry, **attributes)
         self._commit()
         return entry
 
     def get(self, entry_id):
+        """
+
+        :param entry_id:
+        :return:
+        """
         raise NotImplementedError

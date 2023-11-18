@@ -38,8 +38,14 @@ class Singleton(type):
     _instances: Dict[object, object] = {}
 
     def __call__(cls, *args, **kwargs):
+        """
+
+        :param args:
+        :param kwargs:
+        :return:
+        """
         if cls not in Singleton._instances:
             with Singleton._lock:
                 Singleton._instances.setdefault(cls, super().__call__(*args, **kwargs))
             return Singleton._instances[cls]
-
+        return None

@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "ac_db"
+version = "0.1.0"
+description = "backend project"
+authors = ["Aly CIS"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+SQLAlchemy = "^2.0.23"
+tenacity = "^8.2.3"
+pytest = "^7.4.3"
+flake8 = "^6.1.0"
+pylint = "^3.0.2"
+mypy = "^1.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

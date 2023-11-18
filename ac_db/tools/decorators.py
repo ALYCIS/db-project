@@ -6,6 +6,11 @@ from ac_db.exceptions import DbOperationalError
 
 
 def check_operational(func):
+    """
+
+    :param func:
+    :return:
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:

@@ -1,9 +1,10 @@
 import datetime
 
-from sqlalchemy import Column, INTEGER, String, DateTime, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import INTEGER, Boolean, Column, DateTime, String
 
 from ac_db.models.base import Base
+
+# from sqlalchemy.orm import relationship
 
 
 class Migration(Base):
@@ -30,8 +31,5 @@ class Migration(Base):
     migration_last_run = Column("migrationLastRun", DateTime, default=datetime.datetime.utcnow())
     migration_runs = Column("migrationRuns", INTEGER, default=1)
     migration_note = Column("migrationNote", DateTime, unique=False, default="", )
-    #steps = relationship("Step", back_populates="migration")
-    #flows = relationship("Flow", back_populates="migration")
-
-
-
+    # steps = relationship("Step", back_populates="migration")
+    # flows = relationship("Flow", back_populates="migration")

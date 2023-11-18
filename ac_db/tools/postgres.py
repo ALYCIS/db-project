@@ -20,6 +20,10 @@ class Postgres(Model):
 
     @property
     def database(self):
+        """
+        database session
+        :return:
+        """
         if self.__database is None:
             self.__database = SqlAlchemySession(db_address=self.db_address, db_name=self.db_name, db_password=self.db_password,
                                                 pool_size=self.pool_size, pool_pre_ping=self.pool_pre_ping,
